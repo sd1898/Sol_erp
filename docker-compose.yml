@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  # Serviço do Backend (PHP com Laravel)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: sol_erp_backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/var/www/html
+    depends_on:
+      - db
+    networks:
+      - sol_erp_network
+
+  # Serviço do Frontend (React)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: sol_erp_frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend/src:/app/src
+    depends_on:
+      - backend
+    networks:
+      - sol_erp_network
+
+  # Serviço do Banco de Dados (PostgreSQL)
+  db:
+    image: postgres:13-alpine
+    container_name: sol_erp_db
+    environment:
+      POSTGRES_DB: sol_erp
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - sol_erp_network
+
+networks:
+  sol_erp_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
