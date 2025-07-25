@@ -10,7 +10,7 @@ const SolucioBotTest = () => {
     setMessage('');
     setResponse(null);
 
-    SolucioBotService.analyzeData({ text: inputData })
+    SolucioBotService.analyzeData({ descricao_problema: inputData })
       .then(res => {
         setResponse(res.data);
         setMessage('Análise do SolucioBot recebida!');
