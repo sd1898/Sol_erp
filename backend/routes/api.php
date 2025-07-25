@@ -26,6 +26,10 @@ use Illuminate\Support\Facades\Route;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
+Route::get('/hello', function () {
+    return ['message' => 'Hello from Backend!'];
+});
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
@@ -43,6 +47,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Rotas para ContatoCliente
     Route::resource('contato-clientes', ContatoClienteController::class);
+    Route::get('clientes/{cliente}/contatos', [ContatoClienteController::class, 'indexByClient']);
 
     // Rotas para ProdutoServico
     Route::resource('produto-servicos', ProdutoServicoController::class);
@@ -56,8 +61,12 @@ Route::middleware('auth:sanctum')->group(function () {
     // Rotas para StatusOS
     Route::resource('status-os', StatusOSController::class);
 
-    // Rotas para Usuários (para seleção de técnicos)
-    Route::get('/users', function () {
-        return App\Models\User::all();
-    });
+    // Rotas para Usuários
+    Route::resource('users', App\Http\Controllers\UserController::class);
+
+    // Rota para o Dashboard
+    Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index']);
+
+    // Rota para o SolucioBot AI
+    Route::post('/soluciobot/analyze', [App\Http\Controllers\SolucioBotController::class, 'analyze']);
 });

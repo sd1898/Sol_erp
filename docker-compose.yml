@@ -59,6 +59,19 @@ services:
     networks:
       - sol_erp_network
 
+  # Serviço de IA (SolucioBot)
+  soluciobot_ai:
+    build:
+      context: ./ai_models/soluciobot_core
+      dockerfile: Dockerfile
+    container_name: sol_erp_soluciobot_ai
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./ai_models/soluciobot_core:/app
+    networks:
+      - sol_erp_network
+
 networks:
   sol_erp_network:
     driver: bridge

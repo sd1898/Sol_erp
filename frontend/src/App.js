@@ -7,6 +7,11 @@ import AuthService from './services/auth.service';
 import Login from './components/Login';
 import Register from './components/Register';
 import Home from './components/Home'; // Novo componente Home
+import TestApi from './components/TestApi';
+import Dashboard from './components/Dashboard';
+import SolucioBotTest from './components/SolucioBotTest';
+import UserList from './components/UserList';
+import UserForm from './components/UserForm';
 import PerfilPermissaoList from './components/PerfilPermissaoList';
 import PerfilPermissaoForm from './components/PerfilPermissaoForm';
 import LojaList from './components/LojaList';
@@ -47,15 +52,35 @@ function App() {
           </Link>
           <div className="navbar-nav mr-auto">
             <li className="nav-item">
-              <Link to={'/home'} className="nav-link">
-                Home
-              </Link>
-            </li>
+                  <Link to={'/home'} className="nav-link">
+                    Home
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link to={'/dashboard'} className="nav-link">
+                    Dashboard
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link to={'/test-api'} className="nav-link">
+                    Testar API
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link to={'/soluciobot-test'} className="nav-link">
+                    Testar SolucioBot
+                  </Link>
+                </li>
             {currentUser && (
               <>
                 <li className="nav-item">
                   <Link to={'/perfil-permissoes'} className="nav-link">
                     Perfis de Permissão
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link to={'/users'} className="nav-link">
+                    Usuários
                   </Link>
                 </li>
                 <li className="nav-item">
@@ -122,9 +147,15 @@ function App() {
             <Route path="/home" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/test-api" element={<TestApi />} />
+            <Route path="/soluciobot-test" element={<SolucioBotTest />} />
             <Route path="/perfil-permissoes" element={<PerfilPermissaoList />} />
             <Route path="/perfil-permissoes/add" element={<PerfilPermissaoForm />} />
             <Route path="/perfil-permissoes/:id" element={<PerfilPermissaoForm />} />
+            <Route path="/users" element={<UserList />} />
+            <Route path="/users/add" element={<UserForm />} />
+            <Route path="/users/:id" element={<UserForm />} />
             <Route path="/lojas" element={<LojaList />} />
             <Route path="/lojas/add" element={<LojaForm />} />
             <Route path="/lojas/:id" element={<LojaForm />} />

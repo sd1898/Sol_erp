@@ -35,6 +35,38 @@ class AuthService {
   getCurrentUser() {
     return JSON.parse(localStorage.getItem('user'));
   }
+
+  getAllUsers() {
+    const user = this.getCurrentUser();
+    if (user && user.access_token) {
+      return axios.get(API_URL + 'users', { headers: { Authorization: 'Bearer ' + user.access_token } });
+    } else {
+      return Promise.reject('No access token found');
+    }
+  }
+
+  getUser(id) {
+    const user = this.getCurrentUser();
+    if (user && user.access_token) {
+      return axios.get(API_URL + 'users/' + id, { headers: { Authorization: 'Bearer ' + user.access_token } });
+    } else {
+      return Promise.reject('No access token found');
+    }
+  }
+
+  updateUser(id, name, email, password, perfil_permissao_id) {
+    const user = this.getCurrentUser();
+    if (user && user.access_token) {
+      return axios.put(API_URL + 'users/' + id, {
+        name,
+        email,
+        password,
+        perfil_permissao_id
+      }, { headers: { Authorization: 'Bearer ' + user.access_token } });
+    } else {
+      return Promise.reject('No access token found');
+    }
+  }
 }
 
 export default new AuthService();

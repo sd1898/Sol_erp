@@ -8,6 +8,10 @@ class ContatoClienteService {
     return axios.get(API_URL + 'contato-clientes', { headers: authHeader() });
   }
 
+  getContatosByCliente(clienteId) {
+    return axios.get(API_URL + `clientes/${clienteId}/contatos`, { headers: authHeader() });
+  }
+
   getContato(id) {
     return axios.get(API_URL + 'contato-clientes/' + id, { headers: authHeader() });
   }

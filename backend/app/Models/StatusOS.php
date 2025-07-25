@@ -20,3 +20,4 @@ class StatusOS extends Model
     protected $casts = [
         'finaliza_os' => 'boolean',
     ];
+}

@@ -15,6 +15,11 @@ class ContatoClienteController extends Controller
         return response()->json(ContatoCliente::all());
     }
 
+    public function indexByClient($clienteId)
+    {
+        return response()->json(ContatoCliente::where('cliente_id', $clienteId)->get());
+    }
+
     /**
      * Store a newly created resource in storage.
      */

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import OrdemServicoService from '../services/ordemServico.service';
 import ClienteService from '../services/cliente.service';
 import LojaService from '../services/loja.service';
+import AuthService from '../services/auth.service'; // Importar AuthService
+import SolucioBotService from '../services/soluciobot.service'; // Importar SolucioBotService
 import { useParams, useNavigate } from 'react-router-dom';
 
 const OrdemServicoForm = () => {
@@ -22,29 +24,27 @@ const OrdemServicoForm = () => {
   const [observacoesGerais, setObservacoesGerais] = useState('');
   const [clientes, setClientes] = useState([]);
   const [lojas, setLojas] = useState([]);
-  const [tecnicos, setTecnicos] = useState([]); // Será preenchido com usuários
+  const [tecnicos, setTecnicos] = useState([]);
+  const [statusOptions, setStatusOptions] = useState([]); // Para o dropdown de status
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    ClienteService.getAllClientes()
-      .then(response => {
-        setClientes(response.data);
+    Promise.all([
+      ClienteService.getAllClientes(),
+      LojaService.getAllLojas(),
+      AuthService.getAllUsers(), // Carregar usuários para técnicos
+      OrdemServicoService.getAllStatusOS() // Carregar status de OS
+    ])
+      .then(([clientesResponse, lojasResponse, usersResponse, statusOSResponse]) => {
+        setClientes(clientesResponse.data);
+        setLojas(lojasResponse.data);
+        setTecnicos(usersResponse.data);
+        setStatusOptions(statusOSResponse.data);
       })
       .catch(e => {
-        setMessage('Erro ao carregar clientes para seleção: ' + e.message);
+        setMessage('Erro ao carregar dados para seleção: ' + e.message);
         console.log(e);
       });
-
-    LojaService.getAllLojas()
-      .then(response => {
-        setLojas(response.data);
-      })
-      .catch(e => {
-        setMessage('Erro ao carregar lojas para seleção: ' + e.message);
-        console.log(e);
-      });
-
-    // TODO: Carregar técnicos (usuários) aqui
 
     if (id) {
       OrdemServicoService.getOrdemServico(id)
@@ -68,6 +68,26 @@ const OrdemServicoForm = () => {
         });
     }
   }, [id]);
+
+  const handleSuggestTipoServico = () => {
+    if (descricaoProblema) {
+      SolucioBotService.analyzeData({ descricao_problema: descricaoProblema })
+        .then(response => {
+          if (response.data && response.data.sugestao_tipo_servico) {
+            setTipoServico(response.data.sugestao_tipo_servico);
+            setMessage('Sugestão de Tipo de Serviço aplicada!');
+          } else {
+            setMessage('Nenhuma sugestão de Tipo de Serviço recebida.');
+          }
+        })
+        .catch(e => {
+          setMessage('Erro ao obter sugestão de Tipo de Serviço: ' + (e.response?.data?.error || e.message));
+          console.error('Erro ao obter sugestão de Tipo de Serviço:', e);
+        });
+    } else {
+      setMessage('Por favor, preencha a Descrição do Problema para obter uma sugestão.');
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -177,7 +197,11 @@ const OrdemServicoForm = () => {
             onChange={(e) => setTecnicoId(e.target.value)}
           >
             <option value="">Selecione um Técnico</option>
-            {/* TODO: Mapear técnicos (usuários) aqui */}
+            {tecnicos.map((tecnico) => (
+              <option key={tecnico.id} value={tecnico.id}>
+                {tecnico.name}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -249,18 +273,27 @@ const OrdemServicoForm = () => {
             onChange={(e) => setDescricaoProblema(e.target.value)}
             rows="3"
           ></textarea>
+          <button type="button" className="btn btn-secondary btn-sm mt-2" onClick={handleSuggestTipoServico}>
+            Obter Sugestão de Tipo de Serviço
+          </button>
         </div>
 
         <div className="form-group">
           <label htmlFor="statusId">Status</label>
-          <input
-            type="text"
+          <select
             className="form-control"
             id="statusId"
             required
             value={statusId}
             onChange={(e) => setStatusId(e.target.value)}
-          />
+          >
+            <option value="">Selecione um Status</option>
+            {statusOptions.map((status) => (
+              <option key={status.id} value={status.id}>
+                {status.nome}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div className="form-group">

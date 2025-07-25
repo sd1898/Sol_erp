@@ -4,28 +4,56 @@ import { Link } from 'react-router-dom';
 
 const EstoqueList = () => {
   const [estoques, setEstoques] = useState([]);
+  const [produtosServicos, setProdutosServicos] = useState([]);
+  const [lojas, setLojas] = useState([]);
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    retrieveEstoques();
-  }, []);
-
-  const retrieveEstoques = () => {
-    EstoqueService.getAllEstoques()
-      .then(response => {
-        setEstoques(response.data);
+    Promise.all([
+      EstoqueService.getAllEstoques(),
+      EstoqueService.getAllProdutoServicos(),
+      EstoqueService.getAllLojas()
+    ])
+      .then(([estoquesResponse, produtosResponse, lojasResponse]) => {
+        setEstoques(estoquesResponse.data);
+        setProdutosServicos(produtosResponse.data);
+        setLojas(lojasResponse.data);
       })
       .catch(e => {
-        setMessage('Erro ao carregar estoques: ' + e.message);
+        setMessage('Erro ao carregar dados: ' + e.message);
         console.log(e);
       });
+  }, []);
+
+  const getProdutoNome = (id) => {
+    const produto = produtosServicos.find(p => p.id === id);
+    return produto ? produto.nome : 'Desconhecido';
+  };
+
+  const getLojaNome = (id) => {
+    const loja = lojas.find(l => l.id === id);
+    return loja ? loja.nome : 'Desconhecida';
   };
 
   const deleteEstoque = (id) => {
     EstoqueService.deleteEstoque(id)
       .then(response => {
         setMessage('Item de estoque excluído com sucesso!');
-        retrieveEstoques();
+        // Recarrega todos os dados após a exclusão
+        Promise.all([
+          EstoqueService.getAllEstoques(),
+          EstoqueService.getAllProdutoServicos(),
+          EstoqueService.getAllLojas()
+        ])
+          .then(([estoquesResponse, produtosResponse, lojasResponse]) => {
+            setEstoques(estoquesResponse.data);
+            setProdutosServicos(produtosResponse.data);
+            setLojas(lojasResponse.data);
+          })
+          .catch(e => {
+            setMessage('Erro ao carregar dados após exclusão: ' + e.message);
+            console.log(e);
+          });
       })
       .catch(e => {
         setMessage('Erro ao excluir item de estoque: ' + e.message);
@@ -49,7 +77,7 @@ const EstoqueList = () => {
                 className="list-group-item"
                 key={index}
               >
-                Produto ID: {item.produto_id} - Loja ID: {item.loja_id} - Qtd: {item.quantidade_atual}
+                Produto: {getProdutoNome(item.produto_id)} - Loja: {getLojaNome(item.loja_id)} - Qtd: {item.quantidade_atual}
                 <div className="float-right">
                   <Link
                     to={'/estoques/' + item.id}

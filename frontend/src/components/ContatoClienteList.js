@@ -10,29 +10,13 @@ const ContatoClienteList = () => {
   useEffect(() => {
     if (clienteId) {
       retrieveContatos(clienteId);
-    } else {
-      // Se não houver clienteId na URL, busca todos os contatos (opcional, dependendo da necessidade)
-      retrieveContatos();
     }
   }, [clienteId]);
 
-  const retrieveContatos = (id = null) => {
-    let serviceCall;
-    if (id) {
-      // Em um cenário real, você teria uma rota de API para contatos por cliente
-      // Por enquanto, vamos filtrar no frontend se todos os contatos forem buscados
-      serviceCall = ContatoClienteService.getAllContatos();
-    } else {
-      serviceCall = ContatoClienteService.getAllContatos();
-    }
-
-    serviceCall
+  const retrieveContatos = (id) => {
+    ContatoClienteService.getContatosByCliente(id)
       .then(response => {
-        if (id) {
-          setContatos(response.data.filter(contato => contato.cliente_id == id));
-        } else {
-          setContatos(response.data);
-        }
+        setContatos(response.data);
       })
       .catch(e => {
         setMessage('Erro ao carregar contatos: ' + e.message);

@@ -70,7 +70,14 @@ class OrdemServicoController extends Controller
             'observacoes_gerais' => 'nullable|string',
         ]);
 
+        $oldStatusId = $ordemServico->status_id;
+
         $ordemServico->update($request->all());
+
+        // Disparar evento se o status_id foi alterado
+        if ($ordemServico->status_id !== $oldStatusId) {
+            event(new \App\Events\OrdemServicoStatusUpdated($ordemServico));
+        }
 
         return response()->json($ordemServico);
     }

@@ -35,6 +35,14 @@ class EstoqueService {
   deleteEstoque(id) {
     return axios.delete(API_URL + 'estoques/' + id, { headers: authHeader() });
   }
+
+  getAllProdutoServicos() {
+    return axios.get(API_URL + 'produto-servicos', { headers: authHeader() });
+  }
+
+  getAllLojas() {
+    return axios.get(API_URL + 'lojas', { headers: authHeader() });
+  }
 }
 
 export default new EstoqueService();

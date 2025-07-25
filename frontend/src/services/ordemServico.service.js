@@ -49,6 +49,18 @@ class OrdemServicoService {
   deleteOrdemServico(id) {
     return axios.delete(API_URL + 'ordem-servicos/' + id, { headers: authHeader() });
   }
+
+  getAllClientes() {
+    return axios.get(API_URL + 'clientes', { headers: authHeader() });
+  }
+
+  getAllLojas() {
+    return axios.get(API_URL + 'lojas', { headers: authHeader() });
+  }
+
+  getAllStatusOS() {
+    return axios.get(API_URL + 'status-os', { headers: authHeader() });
+  }
 }
 
 export default new OrdemServicoService();
